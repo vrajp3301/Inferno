@@ -1,24 +1,25 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 
-st.set_page_config(page_title="Inferno")
+def calculate_retirement_savings(current_age, retirement_age, current_savings, annual_contribution, annual_return):
+    years_to_retirement = retirement_age - current_age
+    future_value = current_savings * (1 + annual_return/100)**years_to_retirement
+    for _ in range(years_to_retirement):
+        future_value += annual_contribution * (1 + annual_return/100)**(years_to_retirement - 1)
+        years_to_retirement -= 1
+    return future_value
 
-st.title("Inferno")
+def main():
+    st.title("Retirement Savings Calculator")
+    st.set_page_config(page_title="Inferno - Retirement Savings Calculator", page_icon=":mortar_board:")
+    current_age = st.number_input("Current Age", min_value=18, max_value=100, value=30, step=1)
+    retirement_age = st.number_input("Desired Retirement Age", min_value=50, max_value=100, value=65, step=1)
+    current_savings = st.number_input("Current Retirement Savings", min_value=0.0, value=50000.0, step=1000.0)
+    annual_contribution = st.number_input("Annual Contribution", min_value=0.0, value=5000.0, step=1000.0)
+    annual_return = st.number_input("Expected Annual Rate of Return (%)", min_value=0.0, max_value=20.0, value=7.0, step=0.1)
+    
+    if st.button("Calculate"):
+        estimated_savings = calculate_retirement_savings(current_age, retirement_age, current_savings, annual_contribution, annual_return)
+        st.write(f"Estimated Retirement Savings: ${estimated_savings:.2f}")
 
-st.write("A retirement savings calculator web app to help users plan their financial future.")
-
-initial_investment = st.number_input("Initial Investment", min_value=0.0, step=1000.0)
-annual_return = st.number_input("Annual Return (%)", min_value=0.0, max_value=100.0, step=0.1)
-withdrawal_rate = st.number_input("Withdrawal Rate (%)", min_value=0.0, max_value=100.0, step=0.1)
-retirement_years = st.number_input("Retirement Years", min_value=1, step=1)
-
-results = pd.DataFrame({
-    "Initial Investment": [initial_investment],
-    "Annual Return (%)": [annual_return],
-    "Withdrawal Rate (%)": [withdrawal_rate],
-    "Retirement Years": [retirement_years],
-    "Success Rate (%)": [np.random.randint(50, 100)]
-})
-
-st.write(results)
+if __name__ == "__main__":
+    main()
